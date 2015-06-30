@@ -93,8 +93,8 @@ class JsonTreeTest extends FlatSpec with Matchers {
                   , inner: Option[Top.Inner]
                   , map: Option[Map[EnumLike,Double]]
                   , dt: DateTime
-                  //, t: Tuple2[String,String]
-                  //, t2: Tuple2[Int,Int]
+                  , t: Tuple2[String,String]
+                  , t2: Tuple2[Int,Int]
                   )
 
   object TopJsonProtocol extends DefaultJsonProtocol {
@@ -102,7 +102,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
     // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
     //
-    implicit val topFormat /*: JsonFormat[Top]*/ = jsonFormat4(Top.apply)
+    implicit val topFormat /*: JsonFormat[Top]*/ = jsonFormat6(Top.apply)
   }
 
   object Top {
@@ -114,7 +114,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
     val color = Color( "some", 1,2,3 )
     val inner = Top.Inner("xxx", color)
-    val top = Top( Some(color), Some(inner), Some(Map(new EnumLike("aaa") -> 900)), DateTime.now )
+    val top = Top( Some(color), Some(inner), Some(Map(new EnumLike("aaa") -> 900)), DateTime.now, ("a","b"), (4,5) )
 
     val js= top.toJson
 
