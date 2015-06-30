@@ -38,7 +38,14 @@ class JsonTreeTest extends FlatSpec with Matchers {
   object TopJsonProtocol extends DefaultJsonProtocol {
     import Top.InnerJsonProtocol._
 
-    implicit val topFormat = jsonFormat2(Top.apply)   // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
+    // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
+    //
+    // PROBLEM: Why is this giving:
+    //  <<
+    //    Error:.. could not find implicit value for evidence parameter of type JsonTreeTest.TopJsonProtocol.JF[JsonTreeTest.this.Top.Inner]
+    //  <<
+    //
+    implicit val topFormat /*: JsonFormat[Top]*/ = jsonFormat2(Top.apply)
   }
 
   object Top {
