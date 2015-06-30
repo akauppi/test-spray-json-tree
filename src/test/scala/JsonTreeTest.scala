@@ -17,6 +17,7 @@ import org.scalatest._
 */
 class JsonTreeTest extends FlatSpec with Matchers {
 
+  //---
   // From https://github.com/spray/spray-json
   //
   case class Color(name: String, red: Int, green: Int, blue: Int)
@@ -27,17 +28,32 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
   import MyJsonProtocol._
 
-  val json = Color("CadetBlue", 95, 158, 160).toJson
-  val color = json.convertTo[Color]
+  //val json = Color("CadetBlue", 95, 158, 160).toJson
+  //val color = json.convertTo[Color]
 
+  //---
+  class EnumLike(val s: String)   // formats as 'JsString' = usable as object key
+
+  object EnumLikeJsonProtocol extends DefaultJsonProtocol {
+    implicit object SomeEnumFormat extends JsonFormat[EnumLike] {
+      def write(v: EnumLike) = JsString(v.s)
+
+      def read(jsv: JsValue) = jsv match {
+        case JsString(s) => new EnumLike(s)
+        case _ => deserializationError(s"EnumLike expected - got $jsv")
+      }
+    }
+  }
+
+  import EnumLikeJsonProtocol._
+  
   // Now our own, using a hierarchy of case classes and options, to model JSON
   //
   // Uncomment the lines, one after the other. We should make them all work.
   //
   case class Top( c: Option[Color]
-                  , inner: Top.Inner
-                  //, inner2: Option[Top.Inner]
-                  //, map: Option[Map[CustomThatFormatsAsJsString,Double]]
+                  , inner: Option[Top.Inner]
+                  , map: Option[Map[EnumLike,Double]]
                   //, dt: DateTime
                   )
 
@@ -48,7 +64,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
     // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
     //
-    implicit val topFormat /*: JsonFormat[Top]*/ = jsonFormat2(Top.apply)
+    implicit val topFormat /*: JsonFormat[Top]*/ = jsonFormat3(Top.apply)
   }
 
   object Top {
@@ -60,7 +76,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
     val color = Color( "some", 1,2,3 )
     val inner = Top.Inner("xxx", color)
-    val top = Top( Some(color), inner )
+    val top = Top( Some(color), Some(inner), Some(Map(new EnumLike("aaa") -> 900)) )
 
     val js= top.toJson
 
