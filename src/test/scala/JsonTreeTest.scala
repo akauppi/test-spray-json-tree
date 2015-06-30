@@ -1,3 +1,6 @@
+/*
+* JsonTreeTest
+*/
 // no package
 
 import spray.json._
@@ -8,6 +11,9 @@ import org.scalatest._
 //import org.joda.time.DateTime
 
 /*
+* References:
+*   Got good ideas from the *question* of this SO entry:
+*   -> http://stackoverflow.com/questions/16512301/convert-polymorphic-case-classes-to-json-and-back
 */
 class JsonTreeTest extends FlatSpec with Matchers {
 
@@ -38,22 +44,15 @@ class JsonTreeTest extends FlatSpec with Matchers {
   object TopJsonProtocol extends DefaultJsonProtocol {
     //import Top.InnerJsonProtocol._    // (does not matter for the error below)
 
+    implicit val innerFormat = jsonFormat2(Top.Inner)
+
     // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
-    //
-    // PROBLEM: Why is this giving:
-    //  <<
-    //    Error:.. could not find implicit value for evidence parameter of type JsonTreeTest.TopJsonProtocol.JF[JsonTreeTest.this.Top.Inner]
-    //  <<
     //
     implicit val topFormat /*: JsonFormat[Top]*/ = jsonFormat2(Top.apply)
   }
 
   object Top {
     case class Inner(s: String, c: Color)
-
-    object InnerJsonProtocol extends DefaultJsonProtocol {
-      implicit val innerFormat = jsonFormat2(Inner)
-    }
   }
 
   behavior of "Case class <-> JSON conversion"; {
