@@ -26,9 +26,10 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
   // Now our own, using a hierarchy of case classes and options, to model JSON
   //
-  case class Top(
-                  c: Option[Color]
-                  //, inner: Top.Inner
+  // Uncomment the lines, one after the other. We should make them all work.
+  //
+  case class Top( c: Option[Color]
+                  , inner: Top.Inner
                   //, inner2: Option[Top.Inner]
                   //, map: Option[Map[CustomThatFormatsAsJsString,Double]]
                   //, dt: DateTime
@@ -37,7 +38,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
   object TopJsonProtocol extends DefaultJsonProtocol {
     import Top.InnerJsonProtocol._
 
-    implicit val topFormat = jsonFormat1(Top.apply)   // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
+    implicit val topFormat = jsonFormat2(Top.apply)   // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
   }
 
   object Top {
@@ -53,7 +54,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
 
     val color = Color( "some", 1,2,3 )
     val inner = Top.Inner("xxx", color)
-    val top = Top( Some(color) /*, inner*/ )
+    val top = Top( Some(color), inner )
 
     val js= top.toJson
 
