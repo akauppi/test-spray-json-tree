@@ -36,7 +36,7 @@ class JsonTreeTest extends FlatSpec with Matchers {
                   )
 
   object TopJsonProtocol extends DefaultJsonProtocol {
-    import Top.InnerJsonProtocol._
+    //import Top.InnerJsonProtocol._    // (does not matter for the error below)
 
     // Spray.json note: since we manually defined 'Top' companion object, have to use '.apply'
     //
